@@ -20,7 +20,9 @@
 #include "Dalvik.h"
 #include "native/InternalNativePriv.h"
 
+#ifdef HAVE_ANDROID_OS
 #include <selinux/android.h>
+#endif
 
 #include <signal.h>
 #include <sys/types.h>
