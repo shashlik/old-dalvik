@@ -20,6 +20,9 @@
 #ifndef DALVIK_DALVIK_H_
 #define DALVIK_DALVIK_H_
 
+// FROM AndroidConfig.h, which we don't have because we aren't building on Android
+#define OS_SHARED_LIB_FORMAT_STR "lib%s.so"
+
 #include "Common.h"
 #include "Inlines.h"
 #include "Misc.h"
