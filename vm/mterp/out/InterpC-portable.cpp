@@ -3042,7 +3042,7 @@ OP_END
  * next instruction.  Here, these are subroutines that return to the caller.
  */
 
-GOTO_TARGET(filledNewArray, bool methodCallRange, bool)
+GOTO_TARGET(filledNewArray, bool methodCallRange)
     {
         ClassObject* arrayClass;
         ArrayObject* newArray;
@@ -3137,7 +3137,7 @@ GOTO_TARGET(filledNewArray, bool methodCallRange, bool)
 GOTO_TARGET_END
 
 
-GOTO_TARGET(invokeVirtual, bool methodCallRange, bool)
+GOTO_TARGET(invokeVirtual, bool methodCallRange)
     {
         Method* baseMethod;
         Object* thisPtr;

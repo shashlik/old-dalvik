@@ -96,7 +96,7 @@ StringObject* dvmCreateStringFromCstr(const std::string& utf8Str);
  * Returns NULL and throws an exception on failure.
  */
 StringObject* dvmCreateStringFromCstrAndLength(const char* utf8Str,
-    u4 utf16Length);
+    size_t utf16Length);
 
 /*
  * Compute the number of characters in a "modified UTF-8" string.  This will
