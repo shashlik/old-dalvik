@@ -21,7 +21,7 @@
 #include "native/InternalNativePriv.h"
 
 #ifdef HAVE_ANDROID_OS
-#include <selinux/android.h>
+// #include <selinux/android.h>
 #endif
 
 #include <signal.h>
@@ -39,11 +39,11 @@
 #include <cutils/multiuser.h>
 #include <sched.h>
 #include <sys/utsname.h>
-#ifdef HAVE_ANDROID_OS
+// #ifdef HAVE_ANDROID_OS
 #include <sys/capability.h>
-#else
+// #else
 #include <sys/resource.h>
-#endif
+// #endif
 
 #if defined(HAVE_PRCTL)
 # include <sys/prctl.h>
@@ -401,28 +401,28 @@ static void enableDebugFeatures(u4 debugFlags)
 #endif
     }
 
-#ifdef HAVE_ANDROID_OS
-    if ((debugFlags & DEBUG_ENABLE_DEBUGGER) != 0) {
-        /* To let a non-privileged gdbserver attach to this
-         * process, we must set its dumpable bit flag. However
-         * we are not interested in generating a coredump in
-         * case of a crash, so also set the coredump size to 0
-         * to disable that
-         */
-        if (prctl(PR_SET_DUMPABLE, 1, 0, 0, 0) < 0) {
-            ALOGE("could not set dumpable bit flag for pid %d: %s",
-                 getpid(), strerror(errno));
-        } else {
-            struct rlimit rl;
-            rl.rlim_cur = 0;
-            rl.rlim_max = RLIM_INFINITY;
-            if (setrlimit(RLIMIT_CORE, &rl) < 0) {
-                ALOGE("could not disable core file generation for pid %d: %s",
-                    getpid(), strerror(errno));
-            }
-        }
-    }
-#endif
+// #ifdef HAVE_ANDROID_OS
+//     if ((debugFlags & DEBUG_ENABLE_DEBUGGER) != 0) {
+//         /* To let a non-privileged gdbserver attach to this
+//          * process, we must set its dumpable bit flag. However
+//          * we are not interested in generating a coredump in
+//          * case of a crash, so also set the coredump size to 0
+//          * to disable that
+//          */
+//         if (prctl(PR_SET_DUMPABLE, 1, 0, 0, 0) < 0) {
+//             ALOGE("could not set dumpable bit flag for pid %d: %s",
+//                  getpid(), strerror(errno));
+//         } else {
+//             struct rlimit rl;
+//             rl.rlim_cur = 0;
+//             rl.rlim_max = RLIM_INFINITY;
+//             if (setrlimit(RLIMIT_CORE, &rl) < 0) {
+//                 ALOGE("could not disable core file generation for pid %d: %s",
+//                     getpid(), strerror(errno));
+//             }
+//         }
+//     }
+// #endif
 }
 
 /*
@@ -461,11 +461,11 @@ static int setCapabilities(int64_t permitted, int64_t effective)
 static int setSELinuxContext(uid_t uid, bool isSystemServer,
                              const char *seInfo, const char *niceName)
 {
-#ifdef HAVE_ANDROID_OS
-    return selinux_android_setcontext(uid, isSystemServer, seInfo, niceName);
-#else
+// #ifdef HAVE_ANDROID_OS
+//     return selinux_android_setcontext(uid, isSystemServer, seInfo, niceName);
+// #else
     return 0;
-#endif
+// #endif
 }
 
 static bool needsNoRandomizeWorkaround() {
@@ -557,36 +557,36 @@ static pid_t forkAndSpecializeCommon(const u4* args, bool isSystemServer)
         int err;
         /* The child process */
 
-#ifdef HAVE_ANDROID_OS
-        extern int gMallocLeakZygoteChild;
-        gMallocLeakZygoteChild = 1;
-
-        /* keep caps across UID change, unless we're staying root */
-        if (uid != 0) {
-            err = prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
-
-            if (err < 0) {
-                ALOGE("cannot PR_SET_KEEPCAPS: %s", strerror(errno));
-                dvmAbort();
-            }
-        }
-
-        for (int i = 0; prctl(PR_CAPBSET_READ, i, 0, 0, 0) >= 0; i++) {
-            err = prctl(PR_CAPBSET_DROP, i, 0, 0, 0);
-            if (err < 0) {
-                if (errno == EINVAL) {
-                    ALOGW("PR_CAPBSET_DROP %d failed: %s. "
-                          "Please make sure your kernel is compiled with "
-                          "file capabilities support enabled.",
-                          i, strerror(errno));
-                } else {
-                    ALOGE("PR_CAPBSET_DROP %d failed: %s.", i, strerror(errno));
-                    dvmAbort();
-                }
-            }
-        }
-
-#endif /* HAVE_ANDROID_OS */
+// #ifdef HAVE_ANDROID_OS
+//         extern int gMallocLeakZygoteChild;
+//         gMallocLeakZygoteChild = 1;
+// 
+//         /* keep caps across UID change, unless we're staying root */
+//         if (uid != 0) {
+//             err = prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
+// 
+//             if (err < 0) {
+//                 ALOGE("cannot PR_SET_KEEPCAPS: %s", strerror(errno));
+//                 dvmAbort();
+//             }
+//         }
+// 
+//         for (int i = 0; prctl(PR_CAPBSET_READ, i, 0, 0, 0) >= 0; i++) {
+//             err = prctl(PR_CAPBSET_DROP, i, 0, 0, 0);
+//             if (err < 0) {
+//                 if (errno == EINVAL) {
+//                     ALOGW("PR_CAPBSET_DROP %d failed: %s. "
+//                           "Please make sure your kernel is compiled with "
+//                           "file capabilities support enabled.",
+//                           i, strerror(errno));
+//                 } else {
+//                     ALOGE("PR_CAPBSET_DROP %d failed: %s.", i, strerror(errno));
+//                     dvmAbort();
+//                 }
+//             }
+//         }
+// 
+// #endif /* HAVE_ANDROID_OS */
 
         if (mountMode != MOUNT_EXTERNAL_NONE) {
             err = mountEmulatedStorage(uid, mountMode);
@@ -600,7 +600,7 @@ static pid_t forkAndSpecializeCommon(const u4* args, bool isSystemServer)
                     // FUSE hasn't been created yet by init.
                     // In either case, continue without external storage.
                 } else {
-                    dvmAbort();
+//                     dvmAbort();
                 }
             }
         }
@@ -608,25 +608,25 @@ static pid_t forkAndSpecializeCommon(const u4* args, bool isSystemServer)
         err = setgroupsIntarray(gids);
         if (err < 0) {
             ALOGE("cannot setgroups(): %s", strerror(errno));
-            dvmAbort();
+//             dvmAbort();
         }
 
         err = setrlimitsFromArray(rlimits);
         if (err < 0) {
             ALOGE("cannot setrlimit(): %s", strerror(errno));
-            dvmAbort();
+//             dvmAbort();
         }
 
         err = setresgid(gid, gid, gid);
         if (err < 0) {
             ALOGE("cannot setresgid(%d): %s", gid, strerror(errno));
-            dvmAbort();
+//             dvmAbort();
         }
 
         err = setresuid(uid, uid, uid);
         if (err < 0) {
             ALOGE("cannot setresuid(%d): %s", uid, strerror(errno));
-            dvmAbort();
+//             dvmAbort();
         }
 
         if (needsNoRandomizeWorkaround()) {
@@ -641,19 +641,19 @@ static pid_t forkAndSpecializeCommon(const u4* args, bool isSystemServer)
         if (err != 0) {
             ALOGE("cannot set capabilities (%llx,%llx): %s",
                 permittedCapabilities, effectiveCapabilities, strerror(err));
-            dvmAbort();
+//             dvmAbort();
         }
 
         err = set_sched_policy(0, SP_DEFAULT);
         if (err < 0) {
             ALOGE("cannot set_sched_policy(0, SP_DEFAULT): %s", strerror(-err));
-            dvmAbort();
+//             dvmAbort();
         }
 
         err = setSELinuxContext(uid, isSystemServer, seInfo, niceName);
         if (err < 0) {
             ALOGE("cannot set SELinux context: %s\n", strerror(errno));
-            dvmAbort();
+//             dvmAbort();
         }
         // These free(3) calls are safe because we know we're only ever forking
         // a single-threaded process, so we know no other thread held the heap
