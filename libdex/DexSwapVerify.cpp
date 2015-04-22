@@ -2921,7 +2921,9 @@ int dexSwapAndVerify(u1* addr, int len)
             DexMapList* pDexMap = (DexMapList*) (addr + pHeader->mapOff);
 
             okay = okay && swapMap(&state, pDexMap);
+            if(!okay) { ALOGE("Failed to swap map"); }
             okay = okay && swapEverythingButHeaderAndMap(&state, pDexMap);
+            if(!okay) { ALOGE("Failed to swap everything but header and map"); }
 
             dexFileSetupBasicPointers(&dexFile, addr);
             state.pDexFile = &dexFile;
