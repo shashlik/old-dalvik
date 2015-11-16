@@ -51,6 +51,27 @@
 
 #define ZYGOTE_LOG_TAG "Zygote"
 
+#include <QCoreApplication>
+
+namespace shashlik {
+struct InputArgs{
+  int argc;
+  char **argv;
+};
+
+void *StartQAppThread(void *threadArg) {
+  InputArgs *args = (struct InputArgs*) threadArg;
+  QCoreApplication app(args->argc, args->argv);
+  app.exec();
+  pthread_exit(NULL);
+}
+
+void StartAppThread(InputArgs &args) {
+  pthread_t thread1;  
+  int rc = pthread_create(&thread1, NULL, StartQAppThread, (void*)&args);
+}
+}
+
 /* must match values in dalvik.system.Zygote */
 enum {
     DEBUG_ENABLE_DEBUGGER           = 1,
@@ -555,6 +576,12 @@ static pid_t forkAndSpecializeCommon(const u4* args, bool isSystemServer)
 
     if (pid == 0) {
         int err;
+
+//         shashlik::InputArgs args = {0, NULL};
+//         shashlik::StartAppThread(args);
+//         while(!qApp) {
+//             sleep(1);
+//         }
         /* The child process */
 
 // #ifdef HAVE_ANDROID_OS
